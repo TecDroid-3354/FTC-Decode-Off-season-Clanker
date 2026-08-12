@@ -16,7 +16,6 @@ import org.firstinspires.ftc.teamcode.utils.extensions.onTrue
 class Robot(private val alliance: Alliance, private val hardwareMap: HardwareMap, private val controller: GamepadEx, telemetry: Telemetry): TecDroidRobot(telemetry, hardwareMap) {
 
     /* Declare your subsystems here */
-    private lateinit var continuousRotationServoExample: CRServoEx
 
     init {
         subsystemInitialization()
@@ -24,16 +23,14 @@ class Robot(private val alliance: Alliance, private val hardwareMap: HardwareMap
 
     /* Initialize your subsystems here */
     override fun subsystemInitialization() {
-        continuousRotationServoExample = CRServoEx(hardwareMap, "servo")
-        continuousRotationServoExample.setRunMode(Motor.RunMode.RawPower)
-        continuousRotationServoExample.inverted = false
+
     }
 
     /* Initialize your teleop controller commands here */
     override fun initTeleOp() {
         controller.a()
-            .onTrue(InstantCommand({ continuousRotationServoExample.set(1.0) }))
-            .onFalse(InstantCommand({ continuousRotationServoExample.set(0.0) }))
+            .onTrue(InstantCommand({ intake.enable() }))
+            .onFalse(InstantCommand({ intake.disable() }))
     }
 
     /* Initialize your auto commands here, set chassis alliance and starting pose */
