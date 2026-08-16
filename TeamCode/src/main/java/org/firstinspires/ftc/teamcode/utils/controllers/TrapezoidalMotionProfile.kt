@@ -6,13 +6,13 @@ import com.seattlesolvers.solverslib.controller.PIDController
 import org.firstinspires.ftc.teamcode.utils.Angle
 import org.firstinspires.ftc.teamcode.utils.AngularAcceleration
 import org.firstinspires.ftc.teamcode.utils.AngularVelocity
-import org.firstinspires.ftc.teamcode.utils.configurations.controlModeConfigurations.TrapezoidalModeConfiguration
+import org.firstinspires.ftc.teamcode.utils.configurations.motorControlModeConfiguration.MotorTrapezoidalModeConfiguration
 import org.firstinspires.ftc.teamcode.utils.devices.OpMotorEx
 import kotlin.math.abs
 import kotlin.math.sign
 import kotlin.math.sqrt
 
-class TrapezoidalMotionProfile(val motor: OpMotorEx, val config: TrapezoidalModeConfiguration) {
+class TrapezoidalMotionProfile(val motor: OpMotorEx, val config: MotorTrapezoidalModeConfiguration) {
 
     // ------- Profile controller ------
     private var controller          : PIDController                     = PIDController(0.0, 0.0, 0.0)

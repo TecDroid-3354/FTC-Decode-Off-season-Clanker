@@ -15,6 +15,8 @@ import org.firstinspires.ftc.teamcode.utils.extensions.onTrue
 
 class Robot(private val alliance: Alliance, private val hardwareMap: HardwareMap, private val controller: GamepadEx, telemetry: Telemetry): TecDroidRobot(telemetry, hardwareMap) {
 
+    /* Declare your Pedro Pathing's Follower here */
+
     /* Declare your subsystems here */
 
     init {
@@ -26,12 +28,11 @@ class Robot(private val alliance: Alliance, private val hardwareMap: HardwareMap
 
     }
 
+    /* Runs indefinitely after the init button on the DS is pressed. Stops when play button is pressed */
+    override fun initLoop() {}
+
     /* Initialize your teleop controller commands here */
-    override fun initTeleOp() {
-        controller.a()
-            .onTrue(InstantCommand({ intake.enable() }))
-            .onFalse(InstantCommand({ intake.disable() }))
-    }
+    override fun initTeleOp() {}
 
     /* Initialize your auto commands here, set chassis alliance and starting pose */
     override fun initAuto() {}

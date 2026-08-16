@@ -1,15 +1,15 @@
-package org.firstinspires.ftc.teamcode.utils.configurations.controlModeConfigurations
+package org.firstinspires.ftc.teamcode.utils.configurations.motorControlModeConfiguration
 
 import com.qualcomm.robotcore.hardware.PIDCoefficients
 import org.firstinspires.ftc.teamcode.utils.Angle
 import org.firstinspires.ftc.teamcode.utils.AngularAcceleration
 import org.firstinspires.ftc.teamcode.utils.AngularVelocity
-import org.firstinspires.ftc.teamcode.utils.devices.ControlMode
+import org.firstinspires.ftc.teamcode.utils.devices.deviceControlMode.MotorControlMode
 
-class TrapezoidalModeConfiguration: ControlModeConfiguration {
+class MotorTrapezoidalModeConfiguration: MotorControlModeConfiguration {
 
-    override val controlMode        : ControlMode
-        get() = ControlMode.TRAPEZOIDAL
+    override val controlMode        : MotorControlMode
+        get() = MotorControlMode.TRAPEZOIDAL
 
     var cruiseVelocity              : AngularVelocity       = AngularVelocity(0.0)
 
@@ -22,27 +22,27 @@ class TrapezoidalModeConfiguration: ControlModeConfiguration {
 
     var profileCoefficients         : PIDCoefficients       = PIDCoefficients()
 
-    fun withCruiseVelocity(value: AngularVelocity)          : TrapezoidalModeConfiguration {
+    fun withCruiseVelocity(value: AngularVelocity)          : MotorTrapezoidalModeConfiguration {
         this.cruiseVelocity         = value
         return this
     }
 
-    fun withAcceleration(value: AngularAcceleration)        : TrapezoidalModeConfiguration {
+    fun withAcceleration(value: AngularAcceleration)        : MotorTrapezoidalModeConfiguration {
         this.acceleration           = value
         return this
     }
 
-    fun withPositionTolerance(value: Double)                : TrapezoidalModeConfiguration {
+    fun withPositionTolerance(value: Double)                : MotorTrapezoidalModeConfiguration {
         this.positionTolerance = value
         return this
     }
 
-    fun withProfileLimits(value: ClosedRange<Angle>)        : TrapezoidalModeConfiguration {
+    fun withProfileLimits(value: ClosedRange<Angle>)        : MotorTrapezoidalModeConfiguration {
         this.profileLimits = value
         return this
     }
 
-    fun withProfileCoefficients(value: PIDCoefficients)     : TrapezoidalModeConfiguration {
+    fun withProfileCoefficients(value: PIDCoefficients)     : MotorTrapezoidalModeConfiguration {
         this.profileCoefficients    = value
         return this
     }

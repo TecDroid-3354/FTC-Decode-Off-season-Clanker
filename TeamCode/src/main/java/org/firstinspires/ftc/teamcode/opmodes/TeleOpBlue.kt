@@ -1,8 +1,0 @@
-package org.firstinspires.ftc.teamcode.opmodes
-
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import org.firstinspires.ftc.teamcode.TeleOpMode
-import org.firstinspires.ftc.teamcode.utils.Alliance.BLUE
-
-@TeleOp(name = "Example TeleOp", group = "TeleOp")
-class TeleOpBlue(): TeleOpMode(BLUE)

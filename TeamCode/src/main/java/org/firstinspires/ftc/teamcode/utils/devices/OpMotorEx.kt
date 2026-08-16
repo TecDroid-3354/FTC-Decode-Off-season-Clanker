@@ -6,20 +6,20 @@ import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.controller.PIDFController
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx
 import org.firstinspires.ftc.teamcode.utils.Angle
-import org.firstinspires.ftc.teamcode.utils.AngularAcceleration
 import org.firstinspires.ftc.teamcode.utils.AngularVelocity
 import org.firstinspires.ftc.teamcode.utils.configurations.OpMotorExConfiguration
-import org.firstinspires.ftc.teamcode.utils.configurations.controlModeConfigurations.ControlModeConfiguration
+import org.firstinspires.ftc.teamcode.utils.configurations.motorControlModeConfiguration.MotorControlModeConfiguration
 import org.firstinspires.ftc.teamcode.utils.extensions.applyGenericConfiguration
-import org.firstinspires.ftc.teamcode.utils.configurations.controlModeConfigurations.PercentageModeConfiguration
-import org.firstinspires.ftc.teamcode.utils.configurations.controlModeConfigurations.PositionModeConfiguration
-import org.firstinspires.ftc.teamcode.utils.configurations.controlModeConfigurations.TrapezoidalModeConfiguration
-import org.firstinspires.ftc.teamcode.utils.configurations.controlModeConfigurations.VelocityModeConfiguration
+import org.firstinspires.ftc.teamcode.utils.configurations.motorControlModeConfiguration.MotorPercentageModeConfiguration
+import org.firstinspires.ftc.teamcode.utils.configurations.motorControlModeConfiguration.MotorPositionModeConfiguration
+import org.firstinspires.ftc.teamcode.utils.configurations.motorControlModeConfiguration.MotorTrapezoidalModeConfiguration
+import org.firstinspires.ftc.teamcode.utils.configurations.motorControlModeConfiguration.MotorVelocityModeConfiguration
 import org.firstinspires.ftc.teamcode.utils.controllers.TrapezoidalMotionProfile
 import org.firstinspires.ftc.teamcode.utils.extensions.setVelocityCoefficients
 import org.firstinspires.ftc.teamcode.utils.extensions.setVelocityFeedforward
 import org.firstinspires.ftc.teamcode.utils.configurations.genericConfigurations.GenericMotorConfiguration
 import org.firstinspires.ftc.teamcode.utils.TecDroidRobot
+import org.firstinspires.ftc.teamcode.utils.devices.deviceControlMode.MotorControlMode
 import java.util.function.BooleanSupplier
 import java.util.function.Supplier
 import kotlin.math.max
@@ -29,7 +29,7 @@ class OpMotorEx(hardwareMap: HardwareMap, motorId: String) {
 
     // ----- Motor and Control Mode variable's creation ----- //
     private var motor                  : MotorEx
-    private lateinit var controlMode            : ControlMode
+    private var controlMode            : MotorControlMode = MotorControlMode.UNKNOWN
     // ----- Useful variables, avoids repetition ----- //
     private var countPerRev                     : Double = 28.0
     private var reduction                       : Double = 1.0
@@ -41,8 +41,8 @@ class OpMotorEx(hardwareMap: HardwareMap, motorId: String) {
     private lateinit var positionController     : PIDFController
     private lateinit var trapezoidalController  : TrapezoidalMotionProfile
     // ----- Commanding wrong control mode exception ----- //
-    private val wrongControlModeCommandException: IllegalAccessException = IllegalAccessException(
-        "Control mode not configured correctly, double check the Control Mode Configuration that you're passing"
+    private val wrongControlModeCommandException: IllegalAccessError = IllegalAccessError(
+        "Control mode not configured correctly, double check the Control Mode Configuration given"
     )
 
     // Initialization code. Runs at class init //
@@ -71,12 +71,12 @@ class OpMotorEx(hardwareMap: HardwareMap, motorId: String) {
     // ------ MOTOR CONTROL MODE COMMANDS -----//
     /**
      * Sets the motor's velocity to a percentage of its capability from -1.0 to 1.0.
-     * Check if a [PercentageModeConfiguration] was passed to the motor's configuration.
-     * If not, an [IllegalAccessException] will be thrown.
+     * Check if a [MotorPercentageModeConfiguration] was passed to the motor's configuration.
+     * If not, an [IllegalAccessError] will be thrown.
      * @param power the desired motor's power from -1.0 to 1.0
      */
     fun setPower(power: Double) {
-        if (controlMode != ControlMode.PERCENTAGE) { throw wrongControlModeCommandException }
+        if (controlMode != MotorControlMode.PERCENTAGE) { throw wrongControlModeCommandException }
 
         val clampedPower = max(-maxPower, min(maxPower, power))
         motor.set(clampedPower)
@@ -85,12 +85,12 @@ class OpMotorEx(hardwareMap: HardwareMap, motorId: String) {
     /**
      * Sets the motor's velocity to a desired [AngularVelocity]. Motor's [countPerRev] and [reduction]
      * are already taken into account to get the system's [maxVelocity].  Pass these values inside a [GenericMotorConfiguration].
-     * Checks if a [VelocityModeConfiguration] was passed to the motor's configuration.
-     * If not, an [IllegalAccessException] will be thrown
+     * Checks if a [MotorVelocityModeConfiguration] was passed to the motor's configuration.
+     * If not, an [IllegalAccessError] will be thrown
      * @param velocity the desired angular velocity
      */
     fun setVelocity(velocity: AngularVelocity) {
-        if (controlMode != ControlMode.VELOCITY) { throw wrongControlModeCommandException }
+        if (controlMode != MotorControlMode.VELOCITY) { throw wrongControlModeCommandException }
 
         val clampedVelocity = velocity.rotPerSec.coerceIn(maxVelocity.rps.unaryMinus(), maxVelocity.rps)
         val transformedVelocity = clampedVelocity * reduction
@@ -102,13 +102,13 @@ class OpMotorEx(hardwareMap: HardwareMap, motorId: String) {
     /**
      * Sets the motor's angle to a desired [Angle]. Motor's [countPerRev] and [reduction]
      * are already taken into account. Pass these values inside a [GenericMotorConfiguration].
-     * Limits are also considered when passing them through a [PositionModeConfiguration]
-     * Checks if a [PositionModeConfiguration] was passed to the motor's configuration.
-     * If not, an [IllegalAccessException] will be thrown.
+     * Limits are also considered when passing them through a [MotorPositionModeConfiguration]
+     * Checks if a [MotorPositionModeConfiguration] was passed to the motor's configuration.
+     * If not, an [IllegalAccessError] will be thrown.
      * @param angle the desired angle
      */
     fun setAngle(angle: Angle) {
-        if (controlMode != ControlMode.POSITION) { throw wrongControlModeCommandException }
+        if (controlMode != MotorControlMode.POSITION) { throw wrongControlModeCommandException }
 
         val clampedAngle = angle.rotations.coerceIn(positionLimits.start.rotations, positionLimits.endInclusive.rotations)
         targetAngle = Angle(clampedAngle)
@@ -117,13 +117,13 @@ class OpMotorEx(hardwareMap: HardwareMap, motorId: String) {
     /**
      * Sets the motor's angle to a desired [Angle] by profiling the motor's movement through [TrapezoidalMotionProfile].
      * Motor's [countPerRev] and [reduction] are already taken into account. Pass these values inside a [GenericMotorConfiguration].
-     * Limits are also considered when passing them through a [TrapezoidalModeConfiguration]
-     * Checks if a [TrapezoidalModeConfiguration] was passed to the motor's configuration.
-     * If not, an [IllegalAccessException] will be thrown.
+     * Limits are also considered when passing them through a [MotorTrapezoidalModeConfiguration]
+     * Checks if a [MotorTrapezoidalModeConfiguration] was passed to the motor's configuration.
+     * If not, an [IllegalAccessError] will be thrown.
      * @param angle the desired profiled angle
      */
     fun setProfiledAngle(angle: Angle) {
-        if (controlMode != ControlMode.TRAPEZOIDAL) { throw wrongControlModeCommandException }
+        if (controlMode != MotorControlMode.TRAPEZOIDAL) { throw wrongControlModeCommandException }
 
         val clampedAngle = angle.rotations.coerceIn(positionLimits.start.rotations, positionLimits.endInclusive.rotations)
         targetAngle = Angle(clampedAngle)
@@ -139,15 +139,15 @@ class OpMotorEx(hardwareMap: HardwareMap, motorId: String) {
 
     /**
      * Checks whether the [positionController] or the [trapezoidalController]'s position is near its target or at it
-     * based on the tolerance declared in its respective [ControlModeConfiguration]. If the configured mode does not correpond
+     * based on the tolerance declared in its respective [MotorControlModeConfiguration]. If the configured mode does not correpond
      * to either positon or trapezoidal an error will be thrown.
      * @return whether the controller has reached its target position
      */
     fun isAtPositionTarget(): BooleanSupplier {
         return {
             when (controlMode) {
-                ControlMode.POSITION -> positionController.atSetPoint()
-                ControlMode.TRAPEZOIDAL -> trapezoidalController.atSetPoint()
+                MotorControlMode.POSITION -> positionController.atSetPoint()
+                MotorControlMode.TRAPEZOIDAL -> trapezoidalController.atSetPoint()
                 else -> throw wrongControlModeCommandException
             }
         }
@@ -162,19 +162,19 @@ class OpMotorEx(hardwareMap: HardwareMap, motorId: String) {
      * Per-instance update logic. Called automatically for every existing [OpMotorEx] inside [TecDroidRobot]
      * when [updateAll] is invoked from its main loop. There is no need to call this method directly from a subsystem.
      * Updates the [trapezoidalController] or [positionController] if this [OpMotorEx] instance was initialized either
-     * wtih [ControlMode.TRAPEZOIDAL] or [ControlMode.POSITION]
+     * wtih [MotorControlMode.TRAPEZOIDAL] or [MotorControlMode.POSITION]
      * Checks if [controlMode] has already been initialized when configuring the motor
      * throguh [applyConfigurationAndResetEncoder]. If not, method's skipped
      */
     private fun updateMotor() {
-        if (!::controlMode.isInitialized) return
+        if (controlMode == MotorControlMode.UNKNOWN) return
 
         when (controlMode) {
-            ControlMode.POSITION -> {
+            MotorControlMode.POSITION -> {
                 val power = positionController.calculate(getPosition().get().rotations, targetAngle.rotations)
                 motor.set(power)
             }
-            ControlMode.TRAPEZOIDAL -> {
+            MotorControlMode.TRAPEZOIDAL -> {
                 trapezoidalController.updateProfile()
             }
             else -> { /* Nothing's done here as the rest of control modes do not require an update in their respective controllers */ }
@@ -182,28 +182,32 @@ class OpMotorEx(hardwareMap: HardwareMap, motorId: String) {
     }
 
     /**
-     * Applies a new [ControlModeConfiguration] to this [OpMotorEx].
+     * Applies a new [MotorControlModeConfiguration] to this [OpMotorEx].
      * This method MUST NOT be called before the original [applyConfigurationAndResetEncoder]
-     * If this configuration's [ControlMode] is different from the last one, some methods
+     * If this configuration's [MotorControlMode] is different from the last one, some methods
      * won't be accessible once this config is applied.
-     * Double check that you're passing the correct [ControlModeConfiguration].
-     * @param config the new [ControlModeConfiguration]
+     * Double check that you're passing the correct [MotorControlModeConfiguration].
+     * @param config the new [MotorControlModeConfiguration]
      */
-    fun applyModeConfiguration(config: ControlModeConfiguration) {
+    fun applyModeConfiguration(config: MotorControlModeConfiguration) {
+        if (config.controlMode != controlMode) {
+            return
+        }
+
         when (config) {
-            is PercentageModeConfiguration -> {
+            is MotorPercentageModeConfiguration -> {
                 maxPower = config.maxPower
             }
-            is VelocityModeConfiguration -> {
+            is MotorVelocityModeConfiguration -> {
                 motor.setVelocityCoefficients(config.velocityCoefficients)
                 motor.setVelocityFeedforward(config.feedforwardCoefficients)
             }
-            is PositionModeConfiguration -> {
+            is MotorPositionModeConfiguration -> {
                 positionController = PIDFController(config.positionCoefficients)
                 positionController.setTolerance(config.positionTolerance)
                 positionLimits = config.positionLimits
             }
-            is TrapezoidalModeConfiguration -> {
+            is MotorTrapezoidalModeConfiguration -> {
                 trapezoidalController = TrapezoidalMotionProfile(this, config)
                 trapezoidalController.setPositionTolerance(config.positionTolerance)
                 positionLimits = config.profileLimits
@@ -214,7 +218,7 @@ class OpMotorEx(hardwareMap: HardwareMap, motorId: String) {
     /**
      * Applies a new [OpMotorExConfiguration]. This method MUST be called before using any of the control methods
      * to ensure correct working. [IllegalAccessException] may be thrown if not.
-     * The [OpMotorEx]'s [ControlMode] will be automatically applied depending on the [ControlModeConfiguration]
+     * The [OpMotorEx]'s [MotorControlMode] will be automatically applied depending on the [MotorControlModeConfiguration]
      * bounded to the [OpMotorExConfiguration].
      * The [GenericMotorConfiguration] should also be passed in as motor inversions and measured values depend
      * on this configuration.
@@ -229,19 +233,19 @@ class OpMotorEx(hardwareMap: HardwareMap, motorId: String) {
         motor.applyGenericConfiguration(newConfig.genericMotorConfiguration, controlMode)
 
         when (val modeConfig = newConfig.controlModeConfiguration) {
-            is PercentageModeConfiguration -> {
+            is MotorPercentageModeConfiguration -> {
                 maxPower = modeConfig.maxPower
             }
-            is VelocityModeConfiguration -> {
+            is MotorVelocityModeConfiguration -> {
                 motor.setVelocityCoefficients(modeConfig.velocityCoefficients)
                 motor.setVelocityFeedforward(modeConfig.feedforwardCoefficients)
             }
-            is PositionModeConfiguration -> {
+            is MotorPositionModeConfiguration -> {
                 positionController = PIDFController(modeConfig.positionCoefficients)
                 positionController.setTolerance(modeConfig.positionTolerance)
                 positionLimits = modeConfig.positionLimits
             }
-            is TrapezoidalModeConfiguration -> {
+            is MotorTrapezoidalModeConfiguration -> {
                 trapezoidalController = TrapezoidalMotionProfile(this, modeConfig)
                 trapezoidalController.setPositionTolerance(modeConfig.positionTolerance)
                 positionLimits = modeConfig.profileLimits

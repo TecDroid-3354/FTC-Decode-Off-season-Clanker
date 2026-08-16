@@ -16,6 +16,10 @@ open class TeleOpMode(val alliance: Alliance): CommandOpMode() {
         robot.initTeleOp()
     }
 
+    override fun initialize_loop() {
+        robot.initLoop()
+    }
+
     override fun run() {
         robot.run()
     }

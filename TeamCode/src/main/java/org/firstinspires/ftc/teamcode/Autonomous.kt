@@ -32,6 +32,10 @@ class Autonomous(private val alliance: Alliance): CommandOpMode() {
         autonomousCommand.schedule()
     }
 
+    override fun initialize_loop() {
+        robot.initLoop()
+    }
+
     override fun run() {
         robot.run()
     }

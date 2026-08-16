@@ -5,7 +5,7 @@ import com.seattlesolvers.solverslib.controller.wpilibcontroller.SimpleMotorFeed
 import com.seattlesolvers.solverslib.hardware.motors.Motor
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx
 import org.firstinspires.ftc.teamcode.utils.configurations.genericConfigurations.GenericMotorConfiguration
-import org.firstinspires.ftc.teamcode.utils.devices.ControlMode
+import org.firstinspires.ftc.teamcode.utils.devices.deviceControlMode.MotorControlMode
 
 fun MotorEx.setVelocityCoefficients(pidCoefficients: PIDCoefficients) {
     this.setVeloCoefficients(
@@ -23,10 +23,10 @@ fun MotorEx.setVelocityFeedforward(feedforward: SimpleMotorFeedforward) {
     )
 }
 
-fun MotorEx.applyGenericConfiguration(config: GenericMotorConfiguration, mode: ControlMode) {
+fun MotorEx.applyGenericConfiguration(config: GenericMotorConfiguration, mode: MotorControlMode) {
     this.inverted = config.inverted
     this.setRunMode(when (mode) {
-        ControlMode.VELOCITY -> Motor.RunMode.VelocityControl
+        MotorControlMode.VELOCITY -> Motor.RunMode.VelocityControl
         else -> Motor.RunMode.RawPower
     })
     this.setCachingTolerance(config.cachingTolerance)

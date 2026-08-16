@@ -7,17 +7,21 @@ import com.seattlesolvers.solverslib.command.Robot
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.utils.constants.RobotConstants.Telemetry.pTelemetry
 import org.firstinspires.ftc.teamcode.utils.devices.OpMotorEx
+import org.firstinspires.ftc.teamcode.utils.devices.OpServoEx
 
 abstract class TecDroidRobot(private val telemetry: Telemetry, private val hardwareMap: HardwareMap): Robot() {
 
     init {
-        OpMotorEx.clearRegistry()
         initBulkReadings()
+        OpMotorEx.clearRegistry()
+        OpServoEx.clearRegistry()
     }
 
     protected abstract fun subsystemInitialization()
 
     protected abstract fun printTelemetry()
+
+    abstract fun initLoop()
 
     abstract fun initTeleOp()
 
@@ -30,6 +34,7 @@ abstract class TecDroidRobot(private val telemetry: Telemetry, private val hardw
     override fun run() {
         CommandScheduler.getInstance().run()
         OpMotorEx.updateAll()
+        OpServoEx.updateAll()
         printTelemetry()
         pTelemetry.update(telemetry)
     }
