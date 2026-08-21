@@ -1,15 +1,21 @@
 package org.firstinspires.ftc.teamcode.utils
 
+import com.bylazar.telemetry.PanelsTelemetry
+import com.bylazar.telemetry.TelemetryManager
+import com.pedropathing.geometry.Pose
+import com.pedropathing.paths.PathChain
 import com.qualcomm.hardware.lynx.LynxModule
 import com.qualcomm.robotcore.hardware.HardwareMap
+import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.command.CommandScheduler
 import com.seattlesolvers.solverslib.command.Robot
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.teamcode.utils.constants.RobotConstants.Telemetry.pTelemetry
 import org.firstinspires.ftc.teamcode.utils.devices.OpMotorEx
 import org.firstinspires.ftc.teamcode.utils.devices.OpServoEx
 
 abstract class TecDroidRobot(private val telemetry: Telemetry, private val hardwareMap: HardwareMap): Robot() {
+
+    val pTelemetry: TelemetryManager = PanelsTelemetry.telemetry
 
     init {
         initBulkReadings()
@@ -25,7 +31,7 @@ abstract class TecDroidRobot(private val telemetry: Telemetry, private val hardw
 
     abstract fun initTeleOp()
 
-    abstract fun initAuto()
+    abstract fun initAuto(startingPose: Pose)
 
     private fun initBulkReadings() {
         super.setBulkReading(hardwareMap, LynxModule.BulkCachingMode.MANUAL)
@@ -40,4 +46,6 @@ abstract class TecDroidRobot(private val telemetry: Telemetry, private val hardw
     }
 
     abstract fun onEnd()
+
+    abstract fun followPathCMD(path: PathChain, holdEnd: Boolean, maxPower: Double): Command
 }

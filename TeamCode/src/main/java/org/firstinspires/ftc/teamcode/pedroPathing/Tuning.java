@@ -36,7 +36,6 @@ import java.util.List;
  */
 @Configurable
 @TeleOp(name = "Tuning", group = "Pedro Pathing")
-@Disabled
 public class Tuning extends SelectableOpMode {
     public static Follower follower;
 
@@ -443,7 +442,7 @@ class LateralVelocityTuner extends OpMode {
      */
     @Override
     public void init_loop() {
-        telemetryM.debug("The robot will run at 1 power until it reaches " + DISTANCE + " inches to the right.");
+        telemetryM.debug("The robot will run at 1 power until it reaches " + DISTANCE + " inches to the left.");
         telemetryM.debug("Make sure you have enough room, since the robot has inertia after cutting power.");
         telemetryM.debug("After running the distance, the robot will cut power from the drivetrain and display the strafe velocity.");
         telemetryM.debug("Press B on Gamepad 1 to stop.");

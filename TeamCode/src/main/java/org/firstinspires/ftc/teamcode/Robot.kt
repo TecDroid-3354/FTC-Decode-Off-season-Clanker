@@ -1,45 +1,65 @@
 package org.firstinspires.ftc.teamcode
 
+import com.pedropathing.follower.Follower
+import com.pedropathing.geometry.Pose
+import com.pedropathing.paths.PathChain
 import com.qualcomm.robotcore.hardware.HardwareMap
-import com.seattlesolvers.solverslib.command.InstantCommand
+import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
-import com.seattlesolvers.solverslib.hardware.motors.CRServo
-import com.seattlesolvers.solverslib.hardware.motors.CRServoEx
-import com.seattlesolvers.solverslib.hardware.motors.Motor
 import org.firstinspires.ftc.robotcore.external.Telemetry
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants
+import org.firstinspires.ftc.teamcode.subsystems.drive.Mecanum
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.TecDroidRobot
-import org.firstinspires.ftc.teamcode.utils.extensions.a
-import org.firstinspires.ftc.teamcode.utils.extensions.onFalse
-import org.firstinspires.ftc.teamcode.utils.extensions.onTrue
 
-class Robot(private val alliance: Alliance, private val hardwareMap: HardwareMap, private val controller: GamepadEx, telemetry: Telemetry): TecDroidRobot(telemetry, hardwareMap) {
+class Robot(
+    private val alliance: Alliance,
+    private val hardwareMap: HardwareMap,
+    private val controller: GamepadEx,
+    telemetry: Telemetry
+): TecDroidRobot(telemetry, hardwareMap) {
 
     /* Declare your Pedro Pathing's Follower here */
-
+    private lateinit var follower: Follower
     /* Declare your subsystems here */
+    private lateinit var drive: Mecanum
 
     init {
         subsystemInitialization()
     }
 
-    /* Initialize your subsystems here */
+    /* Initialize your subsystems and follower here */
     override fun subsystemInitialization() {
-
+        // Follower initialization
+        follower = Constants.createFollower(hardwareMap)
+        // Subsystem initialization
+        drive = Mecanum(follower, controller, alliance)
     }
 
     /* Runs indefinitely after the init button on the DS is pressed. Stops when play button is pressed */
     override fun initLoop() {}
 
     /* Initialize your teleop controller commands here */
-    override fun initTeleOp() {}
+    override fun initTeleOp() {
+        // Chassis default command
+        drive.defaultCommand = drive.driveFollowingDriverInput()
+        // Build Commands:
+        // controller.button().onTrue(Command)
+    }
 
     /* Initialize your auto commands here, set chassis alliance and starting pose */
-    override fun initAuto() {}
+    override fun initAuto(startingPose: Pose) {
+        drive.setPose(startingPose)
+    }
 
     /* When the teleop ends, declare what to do */
     override fun onEnd() {}
 
-    // Print telemetry using the pTelemetry object on RobotConstants.Telemetry. It will be printed on both Panels and Driver Hub.
+    /* Print telemetry using the pTelemetry object on RobotConstants.Telemetry. It will be printed on both Panels and Driver Hub */
     override fun printTelemetry() {}
+
+    /* Common method to follow any path */
+    override fun followPathCMD(path: PathChain, holdEnd: Boolean, maxPower: Double): Command {
+        return drive.followPathCMD(path, holdEnd, maxPower)
+    }
 }
