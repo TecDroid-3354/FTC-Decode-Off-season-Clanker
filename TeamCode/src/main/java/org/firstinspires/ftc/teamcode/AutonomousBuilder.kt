@@ -3,8 +3,14 @@ package org.firstinspires.ftc.teamcode
 import com.pedropathing.geometry.Pose
 import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.command.CommandOpMode
+import com.seattlesolvers.solverslib.command.InstantCommand
+import com.seattlesolvers.solverslib.command.ParallelCommandGroup
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup
+import com.seattlesolvers.solverslib.command.WaitCommand
+import com.seattlesolvers.solverslib.command.WaitUntilCommand
+import com.seattlesolvers.solverslib.command.button.Trigger
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
+import org.firstinspires.ftc.teamcode.paths.Paths
 import org.firstinspires.ftc.teamcode.utils.Alliance
 
 open class AutonomousBuilder(private val alliance: Alliance): CommandOpMode() {
@@ -13,6 +19,9 @@ open class AutonomousBuilder(private val alliance: Alliance): CommandOpMode() {
     private lateinit var controller: GamepadEx
     // Robot's declaration
     private lateinit var robot: Robot
+
+
+    private lateinit var paths: Paths
     // Autonomous command declaration
     private lateinit var autonomousCommand: SequentialCommandGroup
 
@@ -21,8 +30,17 @@ open class AutonomousBuilder(private val alliance: Alliance): CommandOpMode() {
         super.reset()
         controller = GamepadEx(gamepad1)
         robot = Robot(alliance, hardwareMap, controller, telemetry)
-        // TODO Set correct starting pose
-        robot.initAuto(Pose(0.0,0.0))
+        paths = Paths(robot.getFollower(), alliance)
+        robot.initAuto(paths.startingPose)
+
+        autonomousCommand = SequentialCommandGroup(
+            WaitCommand(4000),
+            robot.followPathCMD(paths.Path1, false, 1.0),
+            robot.followPathCMD(paths.Path2, true, 0.8),
+            robot.shootCMD(),
+            WaitUntilCommand{  robot.isFull().not() },
+            robot.followPathCMD(paths.line3, true, 1.0)
+        )
 
         // Schedule autonomous command
         autonomousCommand.schedule()
@@ -36,6 +54,7 @@ open class AutonomousBuilder(private val alliance: Alliance): CommandOpMode() {
     // Executed after the play button is pressed
     override fun run() {
         robot.run()
+        robot.pTelemetry.addData("Robot pose", robot.drive.getPose())
     }
 
     // Executed when the OpMode ends
