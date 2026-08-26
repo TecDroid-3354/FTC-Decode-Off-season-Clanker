@@ -1,7 +1,8 @@
+@file:Suppress("unused")
+
 package org.firstinspires.ftc.teamcode.utils
 
 import kotlin.math.PI
-import kotlin.time.Duration.Companion.seconds
 
 
 // -------------------- DISTANCE --------------------
@@ -18,6 +19,8 @@ import kotlin.time.Duration.Companion.seconds
 
         val cm              : Double get() = meters * 100.0
         val inches          : Double get() = meters / 0.0254
+
+        fun toAngle(radius: Distance)       : Angle     = Angle.fromRadians(this.meters.div(radius.meters))
 
         operator fun plus(other: Distance): Distance    = Distance(meters + other.meters)
         operator fun minus(other: Distance): Distance   = Distance(meters - other.meters)
@@ -40,6 +43,8 @@ import kotlin.time.Duration.Companion.seconds
 
         val degrees         : Double get() = rotations * 360.0
         val radians         : Double get() = rotations * 2.0 * PI
+
+        fun toDistance(radius: Distance)    : Distance  { return Distance.fromMeters(this.radians.times(radius.meters)) }
 
         operator fun plus(other: Angle): Angle          = Angle(rotations + other.rotations)
         operator fun minus(other: Angle): Angle         = Angle(rotations - other.rotations)
@@ -64,6 +69,8 @@ import kotlin.time.Duration.Companion.seconds
         val inps            : Double get() = mps / 0.0254
         val mpsVal          : Double get() = mps
 
+        fun toAngularVelocity(radius: Distance): AngularVelocity    { return AngularVelocity.fromRadPerSec(this.mps.div(radius.meters)) }
+
         operator fun plus(other: LinearVelocity): LinearVelocity    = LinearVelocity(mps + other.mps)
         operator fun minus(other: LinearVelocity): LinearVelocity   = LinearVelocity(mps - other.mps)
         operator fun times(factor: Double): LinearVelocity          = LinearVelocity(mps * factor)
@@ -73,7 +80,7 @@ import kotlin.time.Duration.Companion.seconds
 
     // -------------------- ANGULAR VELOCITY --------------------
     @JvmInline
-    value class AngularVelocity(val rotPerSec: Double): Comparable<AngularVelocity> {
+    value class AngularVelocity(val rps: Double): Comparable<AngularVelocity> {
         companion object {
             @JvmStatic
             fun fromDegPerSec(degps: Double)                    : AngularVelocity       = AngularVelocity(degps / 360.0)
@@ -85,15 +92,16 @@ import kotlin.time.Duration.Companion.seconds
             fun fromRps(rps: Double)                            : AngularVelocity       = AngularVelocity(rps)
         }
 
-        val radPerSec       : Double get() = rotPerSec * 2.0 * PI
-        val degPerSec       : Double get() = rotPerSec * 360.0
-        val rpm             : Double get() = rotPerSec * 60.0
-        val rps             : Double get() = rotPerSec
+        val radPerSec       : Double get() = rps * 2.0 * PI
+        val degPerSec       : Double get() = rps * 360.0
+        val rpm             : Double get() = rps * 60.0
 
-        operator fun plus(other: AngularVelocity): AngularVelocity  = AngularVelocity(rotPerSec + other.rotPerSec)
-        operator fun minus(other: AngularVelocity): AngularVelocity = AngularVelocity(rotPerSec - other.rotPerSec)
-        operator fun times(factor: Double): AngularVelocity         = AngularVelocity(rotPerSec * factor)
-        operator fun div(factor: Double): AngularVelocity           = AngularVelocity(rotPerSec / factor)
+        fun toLinearVelocity(radius: Distance): LinearVelocity      { return LinearVelocity.fromMps(this.radPerSec.times(radius.meters)) }
+
+        operator fun plus(other: AngularVelocity): AngularVelocity  = AngularVelocity(rps + other.rps)
+        operator fun minus(other: AngularVelocity): AngularVelocity = AngularVelocity(rps - other.rps)
+        operator fun times(factor: Double): AngularVelocity         = AngularVelocity(rps * factor)
+        operator fun div(factor: Double): AngularVelocity           = AngularVelocity(rps / factor)
         override fun compareTo(other: AngularVelocity)              : Int { return rps.compareTo(other.rps) }
     }
 

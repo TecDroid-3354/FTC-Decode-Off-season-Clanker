@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode
 
-import com.pedropathing.geometry.Pose
-import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.command.CommandOpMode
+import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
+import org.firstinspires.ftc.teamcode.paths.Curve
 import org.firstinspires.ftc.teamcode.utils.Alliance
 
 open class AutonomousBuilder(private val alliance: Alliance): CommandOpMode() {
@@ -13,6 +13,8 @@ open class AutonomousBuilder(private val alliance: Alliance): CommandOpMode() {
     private lateinit var controller: GamepadEx
     // Robot's declaration
     private lateinit var robot: Robot
+
+    private lateinit var curve: Curve
     // Autonomous command declaration
     private lateinit var autonomousCommand: SequentialCommandGroup
 
@@ -21,8 +23,14 @@ open class AutonomousBuilder(private val alliance: Alliance): CommandOpMode() {
         super.reset()
         controller = GamepadEx(gamepad1)
         robot = Robot(alliance, hardwareMap, controller, telemetry)
+        curve = Curve(robot.getFollower(), alliance)
         // TODO Set correct starting pose
-        robot.initAuto(Pose(0.0,0.0))
+        robot.initAuto(curve.startingPose)
+
+        autonomousCommand = SequentialCommandGroup(
+            robot.followPathCMD(curve.Path1, false, 1.0),
+            InstantCommand({ telemetry.addLine("Command Executed") })
+        )
 
         // Schedule autonomous command
         autonomousCommand.schedule()

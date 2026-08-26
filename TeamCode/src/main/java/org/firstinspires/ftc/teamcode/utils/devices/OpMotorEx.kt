@@ -92,7 +92,7 @@ class OpMotorEx(hardwareMap: HardwareMap, motorId: String) {
     fun setVelocity(velocity: AngularVelocity) {
         if (controlMode != MotorControlMode.VELOCITY) { throw wrongControlModeCommandException }
 
-        val clampedVelocity = velocity.rotPerSec.coerceIn(maxVelocity.rps.unaryMinus(), maxVelocity.rps)
+        val clampedVelocity = velocity.rps.coerceIn(maxVelocity.rps.unaryMinus(), maxVelocity.rps)
         val transformedVelocity = clampedVelocity * reduction
         val velocityInTicksPerSec = transformedVelocity * countPerRev
 

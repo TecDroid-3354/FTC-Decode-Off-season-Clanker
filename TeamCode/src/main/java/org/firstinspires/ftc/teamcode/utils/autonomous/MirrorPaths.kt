@@ -27,6 +27,6 @@ abstract class MirrorPaths(alliance: Alliance) {
      * @return angle in degrees.
      */
     protected fun mirrorHeading(angle: Angle): Double {
-        return if (mirror) normalizeDegrees(Angle.fromRadians(Math.PI).minus(angle).degrees) else angle.degrees
+        return if (mirror) normalizeDegrees(Angle.fromRadians(Math.PI).minus(angle).radians) else angle.radians
     }
 }

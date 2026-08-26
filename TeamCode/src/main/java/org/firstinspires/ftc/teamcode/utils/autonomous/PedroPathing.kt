@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.utils.autonomous
 
 import com.pedropathing.control.FilteredPIDFCoefficients
 import com.pedropathing.control.PIDFCoefficients
+import com.pedropathing.control.PredictiveBrakingCoefficients
 import com.pedropathing.follower.FollowerConstants
 import com.pedropathing.ftc.drivetrains.MecanumConstants
 import com.pedropathing.ftc.localization.constants.OTOSConstants
@@ -114,12 +115,12 @@ object PedroPathing {
      * @return a new [FollowerConstants] containing the specified parameters.
      * @see followerDefaultConstants
      */
-    fun createFollowerConstants(mass: Optional<Mass>,
-                                headingPIDFCoefficients: Optional<PIDFCoefficients>, secondaryHeadingPIDFCoefficients: Optional<PIDFCoefficients>,
-                                forwardZeroPowerAcceleration: Optional<Double>, lateralZeroPowerAcceleration: Optional<Double>,
-                                translationalPIDFCoefficients: Optional<PIDFCoefficients>, secondaryTranslationalPIDFCoefficients: Optional<PIDFCoefficients>,
-                                drivePIDFCoefficients: Optional<PIDFCoefficients>, secondaryDrivePIDFCoefficients: Optional<PIDFCoefficients>,
-                                centripetalScaling: Optional<Double>, movementPIDFSwitchValues: Optional<PIDFSwitchThresholds>
+    fun createFollowerConstantsWithPIDF(mass: Optional<Mass>,
+                                        headingPIDFCoefficients: Optional<PIDFCoefficients>, secondaryHeadingPIDFCoefficients: Optional<PIDFCoefficients>,
+                                        forwardZeroPowerAcceleration: Optional<Double>, lateralZeroPowerAcceleration: Optional<Double>,
+                                        translationalPIDFCoefficients: Optional<PIDFCoefficients>, secondaryTranslationalPIDFCoefficients: Optional<PIDFCoefficients>,
+                                        drivePIDFCoefficients: Optional<PIDFCoefficients>, secondaryDrivePIDFCoefficients: Optional<PIDFCoefficients>,
+                                        centripetalScaling: Optional<Double>, movementPIDFSwitchValues: Optional<PIDFSwitchThresholds>
     ): FollowerConstants {
         // Creating the new FollowerConstants(). It will hold the new configurations
         val newFollowerConstants        : FollowerConstants = followerDefaultConstants
@@ -218,6 +219,59 @@ object PedroPathing {
         }
 
         // Return the new FollowerConstants() object.
+        return newFollowerConstants
+    }
+
+    /**
+     * Creates a new [FollowerConstants] tailored to configure the [com.pedropathing.follower.Follower]
+     * to use predictive braking instead of the traditional translational and drive PIDFs.
+     * @param mass your robot's mass. It is used to compensate for centripetal force.
+     * @param headingPIDFCoefficients the robot's primary heading PIDF Coefficients.
+     * You can adjust the PIDF value LIVE when accessing Panels.
+     * @param secondaryHeadingPIDFCoefficients the robot's secondary heading PIDF Coefficients.
+     * You can adjust the PIDF value live when accessing to Panel.
+     * @param secondaryHeadingPIDFSwitchThreshold the value in which the secondary heading PIDF will start action.
+     * Default value is [Math.PI] / 20.0
+     * @param predictiveBrakingCoefficients these are the coefficients the [com.pedropathing.control.PredictiveBrakingController] will use
+     * in order to determine how the robot should move. Under automatic, run the predictive braking tuner.
+     * You can change values live when accessing Panels.
+     * @return a new [FollowerConstants] containing the necessary settings to use Predictive Braking as the main controller
+     * during Autonomous period.
+     */
+    fun createFollowerConstantsWithPredictiveBraking(mass: Optional<Mass>,
+                                                     headingPIDFCoefficients: Optional<PIDFCoefficients>, secondaryHeadingPIDFCoefficients: Optional<PIDFCoefficients>,
+                                                     secondaryHeadingPIDFSwitchThreshold: Optional<Angle>, predictiveBrakingCoefficients: Optional<PredictiveBrakingCoefficients>
+    ): FollowerConstants {
+        val newFollowerConstants        : FollowerConstants = FollowerConstants()
+
+        // Turn off centripetal scaling as predictive braking takes account curves.
+        newFollowerConstants.centripetalScaling(0.0)
+        newFollowerConstants.usePredictiveBraking = true
+
+        // If present, mass will be updated to a new value. Adjust this according to your robot's weight
+        if (mass.isPresent) {
+            newFollowerConstants.mass(mass.get().kilograms.coerceIn(Double.MIN_VALUE, Double.MAX_VALUE))
+        }
+
+        // If present, heading PIDF coefficients will be applied.
+        if (headingPIDFCoefficients.isPresent) {
+            newFollowerConstants.headingPIDFCoefficients(headingPIDFCoefficients.get())
+        } else { newFollowerConstants.headingPIDFCoefficients(PIDFCoefficients(0.01, 0.0, 0.0, 0.0)) }
+
+        // If present, secondary heading PIDF Coefficients will be applied along with the enabled flag.
+        if (secondaryHeadingPIDFCoefficients.isPresent) {
+            newFollowerConstants.isUseSecondaryHeadingPIDF  = true
+            newFollowerConstants.secondaryHeadingPIDFCoefficients(secondaryHeadingPIDFCoefficients.get())
+
+            if (secondaryHeadingPIDFSwitchThreshold.isPresent) {
+                newFollowerConstants.headingPIDFSwitch = secondaryHeadingPIDFSwitchThreshold.get().radians
+            }
+        } else { newFollowerConstants.isUseSecondaryHeadingPIDF = false }
+
+        if (predictiveBrakingCoefficients.isPresent) {
+            newFollowerConstants.predictiveBrakingCoefficients(predictiveBrakingCoefficients.get())
+        } else { newFollowerConstants.predictiveBrakingCoefficients(PredictiveBrakingCoefficients(0.1, 0.04, 0.0016)) }
+
         return newFollowerConstants
     }
 

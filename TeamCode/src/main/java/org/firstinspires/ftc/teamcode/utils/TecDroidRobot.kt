@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.utils
 
 import com.bylazar.telemetry.PanelsTelemetry
 import com.bylazar.telemetry.TelemetryManager
+import com.pedropathing.follower.Follower
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.PathChain
 import com.qualcomm.hardware.lynx.LynxModule
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.teamcode.utils.devices.OpServoEx
 
 abstract class TecDroidRobot(private val telemetry: Telemetry, private val hardwareMap: HardwareMap): Robot() {
 
-    val pTelemetry: TelemetryManager = PanelsTelemetry.telemetry
+    val pTelemetry: TelemetryManager    = PanelsTelemetry.telemetry
 
     init {
         initBulkReadings()
@@ -48,4 +49,6 @@ abstract class TecDroidRobot(private val telemetry: Telemetry, private val hardw
     abstract fun onEnd()
 
     abstract fun followPathCMD(path: PathChain, holdEnd: Boolean, maxPower: Double): Command
+
+    abstract fun getFollower(): Follower
 }

@@ -1,8 +1,6 @@
-package org.firstinspires.ftc.teamcode.subsystems.drive
+package org.firstinspires.ftc.teamcode.subsystems.mecanumDrive
 
 import com.pedropathing.follower.Follower
-import com.pedropathing.ftc.FTCCoordinates
-import com.pedropathing.ftc.PoseConverter
 import com.pedropathing.geometry.Pose
 import com.pedropathing.math.Vector
 import com.pedropathing.paths.PathChain
@@ -16,6 +14,7 @@ import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D
 import org.firstinspires.ftc.teamcode.utils.Alliance
+import org.firstinspires.ftc.teamcode.utils.extensions.toPose2D
 
 class Mecanum(
     private val follower: Follower,
@@ -52,8 +51,8 @@ class Mecanum(
      * Gets the Follower's current position.
      * @return a [Pose2D] containing the robot's current position in the standard FTC Coordinates
      */
-    fun getPose(): Pose2D {
-        return PoseConverter.poseToPose2D(follower.pose, FTCCoordinates.INSTANCE)
+    fun getPose2D(): Pose2D {
+        return follower.pose.toPose2D()
     }
 
     /**
@@ -61,7 +60,7 @@ class Mecanum(
      * @return a [Rotation2d] as the robot's current heading in radians.
      */
     fun getRotation(): Rotation2d {
-        return Rotation2d(getPose().getHeading(AngleUnit.RADIANS))
+        return Rotation2d(getPose2D().getHeading(AngleUnit.RADIANS))
     }
 
     /**
