@@ -37,8 +37,8 @@ class Mecanum(
     fun driveFollowingDriverInput(): Command {
         return RunCommand({
             follower.setTeleOpDrive(
-                controller.leftX * MecanumConstants.Control.FORWARD_VELOCITY_MULTIPLIER * alliance.multiplier,
-                controller.leftY * MecanumConstants.Control.LATERAL_VELOCITY_MULTIPLIER * alliance.multiplier,
+                controller.leftY * MecanumConstants.Control.FORWARD_VELOCITY_MULTIPLIER * alliance.multiplier,
+                controller.leftX * MecanumConstants.Control.LATERAL_VELOCITY_MULTIPLIER * alliance.multiplier,
                 controller.rightX * MecanumConstants.Control.TURN_VELOCITY_MULTIPLIER,
                 false
             )
@@ -53,6 +53,10 @@ class Mecanum(
      */
     fun getPose2D(): Pose2D {
         return follower.pose.toPose2D()
+    }
+
+    fun getPedroPose(): Pose {
+        return follower.pose
     }
 
     /**
