@@ -47,7 +47,7 @@ class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry): SubsystemBas
     }
 
     fun setHoodPositionCMD(position: Angle): Command {
-        return InstantCommand({setHoodPosition(position)})
+        return InstantCommand({setHoodPosition(position)}, this)
     }
 
     fun modifyCurrentPositionBy(factor: Angle) {

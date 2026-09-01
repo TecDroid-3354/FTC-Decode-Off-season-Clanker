@@ -42,7 +42,7 @@ class Shooter(
 
     // Periodic method //
     override fun periodic() {
-        //setPIDCoefficients()
+        setPIDCoefficients()
         //flyWheelVelocity = AngularVelocity.fromRpm(ShooterConstants.Velocity.shooterDesiredVelocity)
         //setFlyWheelVelocity(flyWheelVelocity)
     }
@@ -64,14 +64,14 @@ class Shooter(
     fun setFlyWheelVelocityCMD(velocity: AngularVelocity): Command {
         return InstantCommand({
             setFlyWheelVelocity(velocity)
-        })
+        }, this)
     }
 
     fun stopCMD(): Command {
         return InstantCommand({
             firstMotor.stopMotor()
             secondMotor.stopMotor()
-        })
+        }, this)
     }
 
     private fun setPIDCoefficients() {

@@ -27,14 +27,14 @@ class Intake(
         return InstantCommand({
             frontMotor.setPower(1.0)
             backMotor.setPower(1.0)
-        })
+        }, this)
     }
 
     fun enableBothOuttakes(): Command {
         return InstantCommand({
             frontMotor.setPower(-1.0)
             backMotor.setPower(-1.0)
-        })
+        }, this)
     }
 
     /**
@@ -44,7 +44,7 @@ class Intake(
         return InstantCommand({
             frontMotor.setPower(0.0)
             backMotor.setPower(0.0)
-        })
+        }, this)
     }
 
     // Setup code //

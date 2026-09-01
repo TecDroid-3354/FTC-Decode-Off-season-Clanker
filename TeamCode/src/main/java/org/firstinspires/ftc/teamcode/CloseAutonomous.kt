@@ -4,16 +4,17 @@ import com.pedropathing.geometry.Pose
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
+import org.firstinspires.ftc.teamcode.paths.FarPaths
 import org.firstinspires.ftc.teamcode.utils.Alliance
 
-open class AutonomousBuilder(private val alliance: Alliance): CommandOpMode() {
+open class CloseAutonomous(private val alliance: Alliance): CommandOpMode() {
 
     // The LogiTech controller
     private lateinit var controller: GamepadEx
     // Robot's declaration
     private lateinit var robot: Robot
     // Declare an instance of your Paths class
-    // TODO
+    private lateinit var farPaths: FarPaths
     // Autonomous command declaration
     private lateinit var autonomousCommand: SequentialCommandGroup
 

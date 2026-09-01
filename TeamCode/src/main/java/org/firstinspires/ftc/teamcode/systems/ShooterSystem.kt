@@ -58,12 +58,12 @@ class ShooterSystem(
     }
 
     // Command to shoot the Artifacts according to pattern
-    fun shoot(motifPatterns: MotifPatterns, velocity: AngularVelocity, angle: Angle) : Command {
+    fun shoot(motifPatterns: MotifPatterns, velocity: Supplier<AngularVelocity>, angle: Supplier<Angle>) : Command {
         val sequentialCMD = SequentialCommandGroup(
-            shooter.setFlyWheelVelocityCMD(velocity),
-            hood.setHoodPositionCMD(angle),
+            shooter.setFlyWheelVelocityCMD(velocity.get()),
+            hood.setHoodPositionCMD(angle.get()),
             WaitCommand(800),
-            InstantCommand({ indexer.feedShooterCMD(motifPatterns).schedule() }),
+            InstantCommand({ indexer.feedAllShooter().schedule() }),
             WaitCommand(3000),
             shooter.setFlyWheelVelocityCMD(AngularVelocity.fromRpm(1000.0))
         )

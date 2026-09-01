@@ -24,7 +24,7 @@ abstract class MirrorPaths(alliance: Alliance) {
      * Mirrors the heading specified. This method is intended to be used within the [com.pedropathing.paths.PathBuilder.setLinearHeadingInterpolation] method.
      * It asks the angle in degrees, so no conversions are needed
      * @param angle the angle to mirror if alliance is red.
-     * @return angle in degrees.
+     * @return angle in radians.
      */
     protected fun mirrorHeading(angle: Angle): Double {
         return if (mirror) normalizeDegrees(Angle.fromRadians(Math.PI).minus(angle).radians) else angle.radians

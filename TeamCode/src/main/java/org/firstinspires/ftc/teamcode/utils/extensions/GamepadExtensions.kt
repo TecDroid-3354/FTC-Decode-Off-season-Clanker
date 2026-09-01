@@ -11,6 +11,10 @@ fun GamepadEx.a()               : GamepadButton     { return this.getGamepadButt
 fun GamepadEx.b()               : GamepadButton     { return this.getGamepadButton(GamepadKeys.Button.B)           ;    }
 fun GamepadEx.x()               : GamepadButton     { return this.getGamepadButton(GamepadKeys.Button.X)           ;    }
 fun GamepadEx.y()               : GamepadButton     { return this.getGamepadButton(GamepadKeys.Button.Y)           ;    }
+fun GamepadEx.triangle()        : GamepadButton     { return this.getGamepadButton(GamepadKeys.Button.TRIANGLE)    ;    }
+fun GamepadEx.circle()          : GamepadButton     { return this.getGamepadButton(GamepadKeys.Button.CIRCLE)      ;    }
+fun GamepadEx.cross()           : GamepadButton     { return this.getGamepadButton(GamepadKeys.Button.CROSS)       ;    }
+fun GamepadEx.square()          : GamepadButton     { return this.getGamepadButton(GamepadKeys.Button.SQUARE)      ;    }
 fun GamepadEx.start()           : GamepadButton     { return this.getGamepadButton(GamepadKeys.Button.START)       ;    }
 fun GamepadEx.back()            : GamepadButton     { return this.getGamepadButton(GamepadKeys.Button.BACK)        ;    }
 fun GamepadEx.dpadDown()        : GamepadButton     { return this.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)   ;    }

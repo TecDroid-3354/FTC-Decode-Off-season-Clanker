@@ -8,9 +8,12 @@ import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.RunCommand
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import com.seattlesolvers.solverslib.controller.PIDFController
+import com.seattlesolvers.solverslib.geometry.Vector2d
 import com.seattlesolvers.solverslib.util.MathUtils
 import org.firstinspires.ftc.robotcore.external.Supplier
 import org.firstinspires.ftc.robotcore.external.Telemetry
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D
 import org.firstinspires.ftc.teamcode.utils.Angle
 
 
@@ -21,10 +24,6 @@ class Turret(val hw: HardwareMap, val telemetry: Telemetry, val rightRTPServoCon
     lateinit var absoluteEncoder: AnalogInput
 
     var limits = Angle.fromDegrees(-141.0)..Angle.fromDegrees(120.0)
-
-    var appliedPower = 0.0
-
-    var pidController = PIDFController(PIDFCoefficients(0.021, 0.0, 0.0, 0.0))
 
     init {
         servoConfig()
@@ -42,23 +41,25 @@ class Turret(val hw: HardwareMap, val telemetry: Telemetry, val rightRTPServoCon
         })
     }
 
-    fun setTurretVoltage(power: Double) {
-        if ((getAbsoluteAngle().degrees <= limits.start.degrees && power < 0.0) ||
-            (getAbsoluteAngle().degrees >= limits.endInclusive.degrees && power > 0.0)) {
-            rightServo.stop()
-            leftServo.stop()
-        } else {
-            appliedPower = power
-            rightServo.setPower(power)
-            leftServo.setPower(power)
-        }
+    private fun setTurretAngle(angle: Angle) {
+        val clampedAngle = angle.rotations.coerceIn(limits.start.rotations, limits.endInclusive.rotations)
+        rightServo.setTargetAngle(Angle(clampedAngle))
+        leftServo.setTargetAngle(Angle(clampedAngle))
     }
 
-    fun alignToAprilTag(tx: Supplier<Angle>): Command {
+    fun setTurretAngleCMD(angle: Supplier<Angle>): Command {
         return RunCommand({
-            val power = pidController.calculate(tx.get().degrees, 0.0)
-            setTurretVoltage(power)
+            setTurretAngle(angle.get())
         })
+            .addRequirements(this)
+    }
+
+    fun calculateTurretAngle(currentPose: Vector2d, targetPose: Vector2d, robotRotation: Angle): Angle {
+        val targetAngle = targetPose.minus(currentPose).angle()
+        val targetAngleAsAngle = Angle.fromRadians(targetAngle)
+        val turretTarget = targetAngleAsAngle.minus(robotRotation)
+        val normalizedAngle = AngleUnit.normalizeDegrees(turretTarget.degrees)
+        return Angle.fromDegrees(normalizedAngle)
     }
 
     // Just need one encoder's reading

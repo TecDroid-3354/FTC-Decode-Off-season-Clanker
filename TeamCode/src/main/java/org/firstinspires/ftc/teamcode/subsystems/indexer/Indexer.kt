@@ -173,7 +173,7 @@ class Indexer(
     }
 
     fun feedShooterCMD(motifPatterns: MotifPatterns): InstantCommand {
-        return InstantCommand({ feedShooterWithDetectedColor(motifPatterns).schedule() })
+        return InstantCommand({ feedShooterWithDetectedColor(motifPatterns).schedule() }, this)
     }
 
     /**
@@ -183,8 +183,8 @@ class Indexer(
      */
     fun feedAllShooter(): SequentialCommandGroup {
         return SequentialCommandGroup(
-            feedCMD(slotList[0]),
             feedCMD(slotList[1]),
+            feedCMD(slotList[0]),
             feedCMD(slotList[2])
         )
     }

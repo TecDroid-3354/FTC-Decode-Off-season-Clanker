@@ -202,7 +202,7 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
 //
 //        // If at set point, no power is requested.
         if (isAtSetPoint().not()) {
-            //setPower(output)
+            setPower(output)
         }
     }
 }

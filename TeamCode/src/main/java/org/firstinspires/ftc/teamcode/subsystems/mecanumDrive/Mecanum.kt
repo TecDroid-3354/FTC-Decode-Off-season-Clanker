@@ -12,9 +12,14 @@ import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.geometry.Rotation2d
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D
 import org.firstinspires.ftc.teamcode.utils.Alliance
+import org.firstinspires.ftc.teamcode.utils.Distance
 import org.firstinspires.ftc.teamcode.utils.extensions.toPose2D
+import org.firstinspires.ftc.teamcode.utils.extensions.toPose2DInverted
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 class Mecanum(
     private val follower: Follower,
@@ -37,7 +42,7 @@ class Mecanum(
     fun driveFollowingDriverInput(): Command {
         return RunCommand({
             follower.setTeleOpDrive(
-                controller.leftY * MecanumConstants.Control.FORWARD_VELOCITY_MULTIPLIER * alliance.multiplier,
+                -controller.leftY * MecanumConstants.Control.FORWARD_VELOCITY_MULTIPLIER * alliance.multiplier,
                 controller.leftX * MecanumConstants.Control.LATERAL_VELOCITY_MULTIPLIER * alliance.multiplier,
                 controller.rightX * MecanumConstants.Control.TURN_VELOCITY_MULTIPLIER,
                 false
@@ -52,11 +57,7 @@ class Mecanum(
      * @return a [Pose2D] containing the robot's current position in the standard FTC Coordinates
      */
     fun getPose2D(): Pose2D {
-        return follower.pose.toPose2D()
-    }
-
-    fun getPedroPose(): Pose {
-        return follower.pose
+        return follower.pose.toPose2DInverted()
     }
 
     /**
@@ -75,6 +76,15 @@ class Mecanum(
         return follower.velocity
     }
 
+    fun getDistanceTo(target: Pose): Distance {
+        val distance = sqrt(
+            (target.x - follower.pose.x).pow(2) +
+                    (target.y - follower.pose.y).pow(2)
+        )
+
+        return Distance.fromInches(distance)
+    }
+
     /**
      * Constructs a new [FollowPathCommand] based on the given parameters
      * @param path the desired path to follow
@@ -83,7 +93,7 @@ class Mecanum(
      * @return a new [FollowPathCommand] with the given parameters
      */
     fun followPathCMD(path: PathChain, holdEnd: Boolean, maxPower: Double): Command {
-        return FollowPathCommand(follower, path, holdEnd, maxPower)
+        return FollowPathCommand(follower, path, holdEnd, maxPower).addRequirements(this)
     }
 
     /**
